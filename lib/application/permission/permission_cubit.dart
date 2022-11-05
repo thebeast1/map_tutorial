@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
 import 'package:map_tutorial/domain/permission/i_permission_service.dart';
 import 'package:map_tutorial/domain/permission/location_permission_status.dart';
 
 part 'permission_state.dart';
 
+@lazySingleton
 class PermissionCubit extends Cubit<PermissionState> {
   final IPermissionService _permissionService;
   StreamSubscription<bool>? _locationStatusSubscription;
