@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:map_tutorial/domain/domain/permission/i_permission_service.dart';
+import 'package:map_tutorial/domain/domain/permission/location_permission_status.dart';
 
 part 'permission_state.dart';
 
@@ -39,6 +40,8 @@ class PermissionCubit extends Cubit<PermissionState> {
   }
 
   void requestLocationPermission() async {
-    await _permissionService.requestLocationPermission();
+    final status = await _permissionService.requestLocationPermission();
+    final bool isGranted = status == LocationPermissionStatus.granted;
+    emit(state.copyWith(isLocationPermissionGranted: isGranted));
   }
 }
