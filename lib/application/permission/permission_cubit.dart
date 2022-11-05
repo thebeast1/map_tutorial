@@ -48,7 +48,7 @@ class PermissionCubit extends Cubit<PermissionState> {
       final previous = pair.first;
       final current = pair.last;
       log("Previous app life cycle stateus is: ${previous.appLifecycleState.name} -- ${previous.isResumed}");
-      log("current app life cycle stateus is: ${current.appLifecycleState.name} -- ${previous.isResumed}");
+      log("current app life cycle stateus is: ${current.appLifecycleState.name} -- ${current.isResumed}");
 
       // if the user was not in the foreground and now comes to the foreground.
       if (previous.isResumed != current.isResumed && current.isResumed) {
