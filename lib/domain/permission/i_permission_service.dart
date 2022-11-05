@@ -1,4 +1,4 @@
-import 'package:map_tutorial/domain/domain/permission/location_permission_status.dart';
+import 'package:map_tutorial/domain/permission/location_permission_status.dart';
 
 abstract class IPermissionService {
   // If the user granted location permission at a time of the app.
