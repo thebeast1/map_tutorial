@@ -9,6 +9,9 @@ class PermissionState {
     this.isLocationServicesEnabled = false,
   });
 
+  bool get isLocationPermissionGrantedAndServiceEnabled =>
+      isLocationPermissionGranted && isLocationServicesEnabled;
+
   PermissionState copyWith({
     bool? isLocationPermissionGranted,
     bool? isLocationServicesEnabled,
