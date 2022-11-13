@@ -20,6 +20,6 @@ initialize() {
 
   getIt.registerLazySingleton<ILocationService>(
       () => GeolocatorLocationService());
-  getIt.registerLazySingleton<LocationCubit>(
-      () => LocationCubit(getIt(), getIt()));
+  getIt.registerFactory<LocationCubit>(
+      () => LocationCubit(getIt(), getIt(), getIt()));
 }
