@@ -35,4 +35,14 @@ class PermissionService implements IPermissionService {
     }
     return result;
   }
+
+  @override
+  Future<void> openAppSettings() {
+    return Geolocator.openAppSettings();
+  }
+
+  @override
+  Future<void> openLocationSettings() {
+    return Geolocator.openLocationSettings();
+  }
 }

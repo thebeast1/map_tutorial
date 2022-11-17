@@ -13,4 +13,12 @@ abstract class IPermissionService {
 
   //Request location permission dialog.
   Future<LocationPermissionStatus> requestLocationPermission();
+
+  //Open location settings, for enable location toggle (GPS services)
+  Future<void> openLocationSettings();
+
+  //Open app settings
+  // if the user denied the location permission
+  // permanently so open the app settings and enable permission manually
+  Future<void> openAppSettings();
 }
