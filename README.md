@@ -1,4 +1,4 @@
-# map_tutorial
+# Map Demo App 
 
 A new Flutter project.
 
