@@ -125,9 +125,20 @@ class PermissionDialog extends StatelessWidget {
                   onPressed: isLocationPermissionGranted
                       ? null
                       : () {
-                          context
-                              .read<PermissionCubit>()
-                              .requestLocationPermission();
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                content: AppSettingsDialog(cancelDialog: () {
+                                  Navigator.of(context).pop();
+                                }, openAppSettings: () {
+                                  context
+                                      .read<PermissionCubit>()
+                                      .openAppSettings();
+                                }),
+                              );
+                            },
+                          );
                         },
                   child:
                       Text(isLocationPermissionGranted ? "allowed" : "allow")),
@@ -149,6 +160,52 @@ class PermissionDialog extends StatelessWidget {
                               .openLocationSettings();
                         },
                   child: Text(isLocationServicesEnabled ? "allowed" : "allow")),
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AppSettingsDialog extends StatelessWidget {
+  final Function openAppSettings;
+  final Function cancelDialog;
+
+  const AppSettingsDialog(
+      {Key? key, required this.openAppSettings, required this.cancelDialog})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(
+            height: 15,
+          ),
+          const Text(
+              "You need to open app settings to grand the location permission"),
+          const SizedBox(
+            height: 15,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButton(
+                  onPressed: () => openAppSettings(),
+                  child: const Text("Open App Settings")),
+              TextButton(
+                  onPressed: () => cancelDialog(),
+                  child: const Text(
+                    "Cancle",
+                    style: TextStyle(color: Colors.red),
+                  )),
             ],
           ),
           const SizedBox(

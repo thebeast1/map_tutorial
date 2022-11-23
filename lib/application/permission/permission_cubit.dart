@@ -53,6 +53,9 @@ class PermissionCubit extends Cubit<PermissionState> {
       // if the user was not in the foreground and now comes to the foreground.
       if (previous.isResumed != current.isResumed && current.isResumed) {
         bool isGranted = await _permissionService.isLocationPermissionGranted();
+        if (state.isLocationPermissionGranted != isGranted && isGranted) {
+          hidOpenAppSettingsDialog();
+        }
         emit(state.copyWith(isLocationPermissionGranted: isGranted));
       }
     });
@@ -67,8 +70,12 @@ class PermissionCubit extends Cubit<PermissionState> {
 
   void requestLocationPermission() async {
     final status = await _permissionService.requestLocationPermission();
+    final bool displayOpenAppSettingsDialog =
+        status == LocationPermissionStatus.deniedForever;
     final bool isGranted = status == LocationPermissionStatus.granted;
-    emit(state.copyWith(isLocationPermissionGranted: isGranted));
+    emit(state.copyWith(
+        isLocationPermissionGranted: isGranted,
+        displayOpenAppSettingsDialog: displayOpenAppSettingsDialog));
   }
 
   Future<void> openAppSettings() async {
@@ -77,5 +84,9 @@ class PermissionCubit extends Cubit<PermissionState> {
 
   Future<void> openLocationSettings() async {
     await _permissionService.openLocationSettings();
+  }
+
+  void hidOpenAppSettingsDialog() {
+    emit(state.copyWith(displayOpenAppSettingsDialog: false));
   }
 }
