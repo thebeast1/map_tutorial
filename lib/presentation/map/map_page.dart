@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:map_tutorial/application/location/location_cubit.dart';
 import 'package:map_tutorial/application/permission/permission_cubit.dart';
 import 'package:map_tutorial/domain/location/location_model.dart';
@@ -34,7 +36,9 @@ class MapPage extends StatelessWidget {
                 builder: (context) {
                   return AlertDialog(
                     content: AppSettingsDialog(cancelDialog: () {
-                      context.read<PermissionCubit>().hidOpenAppSettingsDialog();
+                      context
+                          .read<PermissionCubit>()
+                          .hidOpenAppSettingsDialog();
                     }, openAppSettings: () {
                       context.read<PermissionCubit>().openAppSettings();
                     }),
@@ -58,64 +62,16 @@ class MapPage extends StatelessWidget {
             title: const Text("Map Tutorial"),
           ),
           body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                BlocSelector<PermissionCubit, PermissionState, bool>(
-                  selector: (state) => state.isLocationPermissionGranted,
-                  builder: (context, state) => Text(
-                      "Location Permission : ${state ? 'enabled' : 'disabled'}"),
+            child: FlutterMap(
+              options: MapOptions(
+                center: LatLng(51.509, -0.128),
+                zoom: 3.0,
+              ),
+              layers: [
+                TileLayerOptions(
+                  urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  userAgentPackageName: 'com.example.map_tutorial',
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
-                BlocSelector<PermissionCubit, PermissionState, bool>(
-                  selector: (state) => state.isLocationServicesEnabled,
-                  builder: (context, state) {
-                    return Text(
-                        "Location Services : ${state ? 'enabled' : 'disabled'}");
-                  },
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                OutlinedButton(
-                    onPressed: () {
-                      // context.read<PermissionCubit>().requestLocationPermission();
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          final bool isLocationPermissionGranted =
-                              context.select((PermissionCubit element) =>
-                                  element.state.isLocationPermissionGranted);
-                          // to get the new data right away.
-                          final bool isLocationServicesEnabled = context.select(
-                              (PermissionCubit element) =>
-                                  element.state.isLocationServicesEnabled);
-                          return AlertDialog(
-                            content: PermissionDialog(
-                                isLocationPermissionGranted:
-                                    isLocationPermissionGranted,
-                                isLocationServicesEnabled:
-                                    isLocationServicesEnabled),
-                          );
-                        },
-                      );
-                    },
-                    child: const Text("Request Location Permission")),
-                const SizedBox(
-                  height: 20,
-                ),
-                BlocSelector<LocationCubit, LocationState, LocationModel>(
-                  selector: (state) {
-                    return state.userLocation;
-                  },
-                  builder: (context, userLocation) {
-                    return Text(
-                        "Latitude:${userLocation.latitude} Longitude: ${userLocation.longitude}");
-                  },
-                ),
-                // const PermissionDialog()
               ],
             ),
           ),
