@@ -12,14 +12,47 @@ class MapPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => getIt<LocationCubit>(),
-      child: BlocListener<PermissionCubit, PermissionState>(
-        listenWhen: (p, c) =>
-            p.isLocationPermissionGrantedAndServiceEnabled !=
-                c.isLocationPermissionGrantedAndServiceEnabled &&
-            c.isLocationPermissionGrantedAndServiceEnabled,
-        listener: (context, state) {
-          Navigator.pop(context);
-        },
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<PermissionCubit, PermissionState>(
+            listenWhen: (p, c) =>
+                p.isLocationPermissionGrantedAndServiceEnabled !=
+                    c.isLocationPermissionGrantedAndServiceEnabled &&
+                c.isLocationPermissionGrantedAndServiceEnabled,
+            listener: (context, state) {
+              Navigator.pop(context);
+            },
+          ),
+          BlocListener<PermissionCubit, PermissionState>(
+            listenWhen: (p, c) =>
+                p.displayOpenAppSettingsDialog !=
+                    c.displayOpenAppSettingsDialog &&
+                c.displayOpenAppSettingsDialog,
+            listener: (context, state) {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    content: AppSettingsDialog(cancelDialog: () {
+                      context.read<PermissionCubit>().hidOpenAppSettingsDialog();
+                    }, openAppSettings: () {
+                      context.read<PermissionCubit>().openAppSettings();
+                    }),
+                  );
+                },
+              );
+            },
+          ),
+          BlocListener<PermissionCubit, PermissionState>(
+            listenWhen: (p, c) =>
+                p.displayOpenAppSettingsDialog !=
+                    c.displayOpenAppSettingsDialog &&
+                !c.displayOpenAppSettingsDialog,
+            listener: (context, state) {
+              Navigator.pop(context);
+            },
+          ),
+        ],
         child: Scaffold(
           appBar: AppBar(
             title: const Text("Map Tutorial"),
@@ -125,20 +158,9 @@ class PermissionDialog extends StatelessWidget {
                   onPressed: isLocationPermissionGranted
                       ? null
                       : () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                content: AppSettingsDialog(cancelDialog: () {
-                                  Navigator.of(context).pop();
-                                }, openAppSettings: () {
-                                  context
-                                      .read<PermissionCubit>()
-                                      .openAppSettings();
-                                }),
-                              );
-                            },
-                          );
+                          context
+                              .read<PermissionCubit>()
+                              .requestLocationPermission();
                         },
                   child:
                       Text(isLocationPermissionGranted ? "allowed" : "allow")),
@@ -203,7 +225,7 @@ class AppSettingsDialog extends StatelessWidget {
               TextButton(
                   onPressed: () => cancelDialog(),
                   child: const Text(
-                    "Cancle",
+                    "Cancel",
                     style: TextStyle(color: Colors.red),
                   )),
             ],

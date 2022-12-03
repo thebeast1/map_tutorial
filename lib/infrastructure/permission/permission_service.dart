@@ -1,5 +1,5 @@
 import 'package:injectable/injectable.dart';
-import 'package:map_tutorial/domain/permission/i_permission_service.dart';
+import 'package:map_tutorial/domain/permission/i_permission_servic.dart';
 import 'package:map_tutorial/domain/permission/location_permission_status.dart';
 import 'package:geolocator/geolocator.dart';
 

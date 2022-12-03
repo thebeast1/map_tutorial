@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:map_tutorial/application/application_life_cycle/application_life_cycle_cubit.dart';
-import 'package:map_tutorial/domain/permission/i_permission_service.dart';
+import 'package:map_tutorial/domain/permission/i_permission_servic.dart';
 import 'package:map_tutorial/domain/permission/location_permission_status.dart';
 import 'package:rxdart/rxdart.dart';
 
