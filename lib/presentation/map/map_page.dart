@@ -4,7 +4,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:map_tutorial/application/location/location_cubit.dart';
 import 'package:map_tutorial/application/permission/permission_cubit.dart';
-import 'package:map_tutorial/domain/location/location_model.dart';
 import 'package:map_tutorial/injection.dart';
 
 class MapPage extends StatelessWidget {
@@ -22,7 +21,7 @@ class MapPage extends StatelessWidget {
                     c.isLocationPermissionGrantedAndServiceEnabled &&
                 c.isLocationPermissionGrantedAndServiceEnabled,
             listener: (context, state) {
-              Navigator.pop(context);
+              if (Navigator.of(context).canPop()) Navigator.pop(context);
             },
           ),
           BlocListener<PermissionCubit, PermissionState>(
@@ -61,23 +60,107 @@ class MapPage extends StatelessWidget {
           appBar: AppBar(
             title: const Text("Map Tutorial"),
           ),
-          body: Center(
-            child: FlutterMap(
-              options: MapOptions(
-                center: LatLng(51.509, -0.128),
-                zoom: 3.0,
-              ),
-              layers: [
-                TileLayerOptions(
-                  urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-                  userAgentPackageName: 'com.example.map_tutorial',
+          body: Stack(
+            children: [
+              Center(
+                child: BlocBuilder<LocationCubit, LocationState>(
+                  buildWhen: (p, c) => p.userLocation != c.userLocation,
+                  builder: (context, state) {
+                    return FlutterMap(
+                      options: MapOptions(
+                        center: LatLng(30.0588539, 31.4247228),
+                        zoom: 14.0,
+                      ),
+                      layers: [
+                        TileLayerOptions(
+                          urlTemplate:
+                              "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                          userAgentPackageName: 'com.example.map_tutorial',
+                        ),
+                        MarkerLayerOptions(markers: [
+                          Marker(
+                            point: LatLng(state.userLocation.latitude,
+                                state.userLocation.longitude),
+                            width: 60,
+                            height: 60,
+                            builder: (context) {
+                              return const UserMarker();
+                            },
+                          )
+                        ]),
+                      ],
+                    );
+                  },
                 ),
-              ],
-            ),
+              ),
+              BlocSelector<PermissionCubit, PermissionState, bool>(
+                selector: (state) {
+                  return state.isLocationPermissionGrantedAndServiceEnabled;
+                },
+                builder:
+                    (context, isLocationPermissionGrantedAndServiceEnabled) {
+                  return isLocationPermissionGrantedAndServiceEnabled
+                      ? const SizedBox.shrink()
+                      : const Positioned(
+                          right: 30, bottom: 50, child: LocationButton());
+                },
+              ),
+            ],
           ),
         ),
       ),
     );
+  }
+}
+
+class UserMarker extends StatelessWidget {
+  const UserMarker({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.black,
+        shape: BoxShape.circle,
+      ),
+      child: const Icon(
+        Icons.person_pin,
+        color: Colors.white,
+        size: 35,
+      ),
+    );
+  }
+}
+
+class LocationButton extends StatelessWidget {
+  const LocationButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+        style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+                (states) => Colors.black)),
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              final bool isLocationPermissionGranted = context.select(
+                  (PermissionCubit element) =>
+                      element.state.isLocationPermissionGranted);
+              // to get the new data right away.
+              final bool isLocationServicesEnabled = context.select(
+                  (PermissionCubit element) =>
+                      element.state.isLocationServicesEnabled);
+              return AlertDialog(
+                content: PermissionDialog(
+                    isLocationPermissionGranted: isLocationPermissionGranted,
+                    isLocationServicesEnabled: isLocationServicesEnabled),
+              );
+            },
+          );
+        },
+        child: const Text('Location Permission'));
   }
 }
 
